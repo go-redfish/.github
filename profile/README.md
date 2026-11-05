@@ -16,7 +16,7 @@ shelling out to a Python client.
 
 | Repo | Latest | |
 |---|---|---|
-| [`redfish`](https://github.com/go-redfish/redfish) | v0.2.0 | The client: service discovery, Basic or session authentication, a CA file for the BMC's certificate, bounded answers, typed errors; a `Meter` that turns reads into energy; the mock BMC and the `redfish` command are being added. Standard library only. |
+| [`redfish`](https://github.com/go-redfish/redfish) | v0.9.0 | The client: service discovery, Basic or session authentication, a CA file for the BMC's certificate, bounded answers, typed errors. Systems, chassis, managers, accounts and sessions, firmware update and storage, plus a `Meter` that turns reads into energy. Comes with the `redfish` command and a stateful mock BMC built from two DMTF trees. The library uses only the standard library. |
 | [`brand`](https://github.com/go-redfish/brand) | | The logos of the organisation, in every format. |
 | [`docs`](https://github.com/go-redfish/docs) | | The documentation site (Hugo + Hextra): getting started, security model, mock BMC, CLI reference, parity. |
 | [`go-redfish.github.io`](https://github.com/go-redfish/go-redfish.github.io) | | This organisation's landing page. |
@@ -28,9 +28,11 @@ BMC.
 ## Parity with the Python tooling
 
 The target is the behaviour of `community.general.redfish_info`, `redfish_command` and
-`redfish_config` (the Ansible modules, themselves built on DMTF's `redfishtool`). Which command
-is done, which is not, and how each is tested against the reference is tracked in
-[`PARITY.md`](https://github.com/go-redfish/redfish/blob/main/PARITY.md) in the `redfish` repository.
+`redfish_config` (the Ansible modules, themselves built on DMTF's `redfishtool`). **Since v0.9.0,
+all 99 of their commands are done.**
+[`PARITY.md`](https://github.com/go-redfish/redfish/blob/main/PARITY.md) in the `redfish` repository
+names, for each one, its function, its command and the tests behind it. A test fails if a row goes
+back to todo.
 
 ## Security posture
 
