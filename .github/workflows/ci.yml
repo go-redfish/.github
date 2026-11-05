@@ -1,0 +1,21 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  profile:
+    name: the organisation profile exists and names its repositories
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: profile/README.md
+        run: |
+          test -s profile/README.md
+          grep -q 'github.com/go-redfish/redfish' profile/README.md
