@@ -1,0 +1,55 @@
+name: Renovate
+
+on:
+  schedule:
+    # Staggered against the other organisations' runners. Scheduled runs on
+    # this account fire hours behind their cron whatever is asked for, so the
+    # exact minute matters less than not asking at the same instant as a
+    # neighbour. Measured 2026-11-07 over 160 runners: 3h18m to 8h03m behind.
+    #
+    # 5:47 is taken by cloud-slurm-cluster AND go-slurmstack, so this is not it.
+    - cron: '19 7 * * *'
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: Renovate log level
+        default: info
+
+concurrency:
+  group: renovate
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Run Renovate
+        uses: renovatebot/github-action@v46.3.12
+        with:
+          configurationFile: config.js
+          # ⛔ RENOVATE_TOKEN must exist as a repository secret on this
+          # repository. An unset secret expands to the empty string and the
+          # action then fails with "'token' MUST be passed using its input or
+          # the 'RENOVATE_TOKEN' environment variable" — in about ten seconds,
+          # every night, which reads as activity to any check that only asks
+          # whether runs happen. Sixteen organisations were in that state on
+          # 2026-10-31, none of which had ever received a dependency update.
+          #
+          # ⚠ AND IT CANNOT BE CHECKED FROM INSIDE THIS WORKFLOW. GitHub's
+          # documentation is explicit that "secrets cannot be directly
+          # referenced in `if:` conditionals", and the `secrets` context is
+          # absent from the availability table for both step-level and
+          # job-level `if`. The documented workaround — copy it into a job
+          # environment variable and test that — puts a credential in an
+          # environment variable to learn something that needs no value at all.
+          # So the check lives OUTSIDE: `quietscan` compares the secrets a
+          # workflow references against the ones that exist, and reports
+          # `missing_secret` with the name. go-slurmstack was caught that way
+          # in one day instead of ten.
+          token: ${{ secrets.RENOVATE_TOKEN }}
+        env:
+          LOG_LEVEL: ${{ inputs.logLevel || 'info' }}
